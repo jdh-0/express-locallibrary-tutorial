@@ -15,14 +15,37 @@ var app = express();
 
 
 // Set up mongoose connection
-var mongoose = require('mongoose');
-var dev_db_url = 'mongodb+srv://cooluser:coolpassword@cluster0.a9azn.mongodb.net/local_library?retryWrites=true';
-var mongoDB = process.env.MONGODB_URI || dev_db_url;
-mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true});
-mongoose.Promise = global.Promise;
-var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+// var mongoose = require('mongoose');
+// const { Console } = require('console');
+// var dev_db_url = 'mongodb://localhost:27017/mongo_test';
+// var mongoDB = dev_db_url;
+// mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true}).then(() => { console.log("db연결")});
+// mongoose.Promise = global.Promise;
+// var db = mongoose.connection;
+// db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
+
+const mysql = require('mysql');
+const myConnection = mysql.createConnection({
+  host      : 'localhost',
+  user      : 'root',
+  password  : '1q2w3e4r!',
+  database  : 'node_test'
+});
+
+myConnection.connect();
+
+myConnection.query('SELECT * FROM user', (error, rows, fields) => {
+  if (error) console.log(error);
+  console.log('User info is : ', rows); 
+
+  for(val in rows){
+    let name = rows[val].name;
+    let age = rows[val].age;
+    console.log("이름 : " + rows[val].name + ",나이 : " + rows[val].age);
+    console.log("이름 : ${name},나이 : ${age}");
+  }
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -40,9 +63,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/catalog', catalogRouter);  // Add catalog routes to middleware chain.
-
+console.log('연결이...');
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
+  console('연결은 됐으나');
   next(createError(404));
 });
 
@@ -57,4 +81,5 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+console.log('연결이...?');
 module.exports = app;
